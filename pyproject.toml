@@ -1,0 +1,48 @@
+[project]
+name = "youtube-feed"
+version = "0.1.0"
+description = "YouTube feed with RSS polling, transcript summaries, and Telegram notifications."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27.0",
+  "python-dotenv>=1.0.1",
+  "typer>=0.12.3",
+  "youtube-transcript-api>=1.0.3",
+]
+
+[project.scripts]
+youtube-feed = "youtube_feed.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.2",
+  "ruff>=0.11.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/youtube_feed"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+  ".tools",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+  "UP",
+]
