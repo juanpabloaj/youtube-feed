@@ -1,6 +1,9 @@
 from datetime import UTC, datetime
 
-from youtube_feed.rss import parse_channel_videos_page, parse_feed
+import httpx
+import pytest
+
+from youtube_feed.rss import YouTubeRssClient, parse_channel_videos_page, parse_feed
 
 HTML_FIXTURE = """
 <html>
@@ -100,3 +103,42 @@ def test_parse_feed_preserves_shorts_link_from_alternate_url() -> None:
 
     assert results[0].url == "https://www.youtube.com/shorts/short123"
     assert results[1].url == "https://www.youtube.com/watch?v=video123"
+
+
+def test_fallback_request_does_not_send_browser_headers() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.path == "/feeds/videos.xml":
+            return httpx.Response(404)
+        return httpx.Response(200, text=HTML_FIXTURE)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    rss_client = YouTubeRssClient(client)
+
+    rss_client.fetch_channel("channel-1")
+    client.close()
+
+    assert len(requests) == 2
+    assert requests[1].url.path == "/channel/channel-1/videos"
+    assert requests[1].headers.get("accept-language") is None
+    assert "Chrome/135" not in requests[1].headers.get("user-agent", "")
+
+
+def test_fallback_reports_youtube_consent_redirect() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/feeds/videos.xml":
+            return httpx.Response(404)
+        return httpx.Response(
+            302,
+            headers={"location": "https://consent.youtube.com/m?continue=..."},
+        )
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    rss_client = YouTubeRssClient(client)
+
+    with pytest.raises(httpx.HTTPError, match="consent page"):
+        rss_client.fetch_channel("channel-1")
+
+    client.close()

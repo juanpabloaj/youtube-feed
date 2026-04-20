@@ -47,8 +47,9 @@ class YouTubeRssClient:
     def _fetch_channel_videos_fallback(self, channel_id: str) -> list[FeedVideo]:
         response = self._http_client.get(
             YOUTUBE_CHANNEL_VIDEOS_URL.format(channel_id=channel_id),
-            headers=YOUTUBE_HEADERS,
         )
+        if _is_youtube_consent_redirect(response):
+            raise httpx.HTTPError("YouTube channel videos fallback redirected to consent page.")
         response.raise_for_status()
         try:
             return parse_channel_videos_page(
@@ -135,6 +136,11 @@ def _parse_rfc3339(value: str) -> datetime:
 
 def _clean_text(value: str) -> str:
     return " ".join(value.split())
+
+
+def _is_youtube_consent_redirect(response: httpx.Response) -> bool:
+    location = response.headers.get("location", "")
+    return 300 <= response.status_code < 400 and "consent.youtube.com" in location
 
 
 def _extract_entry_link(entry: ElementTree.Element) -> str:
