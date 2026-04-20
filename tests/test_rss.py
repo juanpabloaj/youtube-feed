@@ -105,7 +105,7 @@ def test_parse_feed_preserves_shorts_link_from_alternate_url() -> None:
     assert results[1].url == "https://www.youtube.com/watch?v=video123"
 
 
-def test_fallback_request_does_not_send_browser_headers() -> None:
+def test_fallback_request_uses_curl_user_agent_without_browser_headers() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -123,7 +123,7 @@ def test_fallback_request_does_not_send_browser_headers() -> None:
     assert len(requests) == 2
     assert requests[1].url.path == "/channel/channel-1/videos"
     assert requests[1].headers.get("accept-language") is None
-    assert "Chrome/135" not in requests[1].headers.get("user-agent", "")
+    assert requests[1].headers.get("user-agent") == "curl/8.5.0"
 
 
 def test_fallback_reports_youtube_consent_redirect() -> None:

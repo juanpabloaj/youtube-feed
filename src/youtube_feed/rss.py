@@ -25,6 +25,7 @@ YOUTUBE_HEADERS = {
         "Chrome/135.0.0.0 Safari/537.36"
     ),
 }
+YOUTUBE_FALLBACK_HEADERS = {"User-Agent": "curl/8.5.0"}
 
 
 class YouTubeRssClient:
@@ -47,6 +48,7 @@ class YouTubeRssClient:
     def _fetch_channel_videos_fallback(self, channel_id: str) -> list[FeedVideo]:
         response = self._http_client.get(
             YOUTUBE_CHANNEL_VIDEOS_URL.format(channel_id=channel_id),
+            headers=YOUTUBE_FALLBACK_HEADERS,
         )
         if _is_youtube_consent_redirect(response):
             raise httpx.HTTPError("YouTube channel videos fallback redirected to consent page.")
