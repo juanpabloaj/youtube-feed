@@ -144,7 +144,7 @@ def make_feed_video(video_id: str = "video-1", *, channel_id: str = "channel-1")
         channel_id=channel_id,
         channel_title=f"Channel {channel_id}",
         title="A useful video",
-        published_at=datetime(2026, 4, 17, 12, 0, tzinfo=UTC),
+        published_at=datetime.now(tz=UTC) - timedelta(days=1),
         url=f"https://www.youtube.com/watch?v={video_id}",
     )
 
@@ -156,8 +156,8 @@ def make_transcript(language: str = "Spanish", code: str = "es") -> TranscriptDa
         language_code=code,
         is_generated=False,
         snippets=(
-            TranscriptSnippet(text="hola mundo", start=0.0, duration=120.0),
-            TranscriptSnippet(text="esto explica el tema", start=120.0, duration=120.0),
+            TranscriptSnippet(text="hola mundo", start=0.0, duration=180.0),
+            TranscriptSnippet(text="esto explica el tema", start=180.0, duration=180.0),
         ),
     )
 

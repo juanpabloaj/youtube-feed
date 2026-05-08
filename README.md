@@ -66,7 +66,7 @@ These variables are optional. The CLI prints the resolved effective configuratio
 | `GEMINI_MAX_INPUT_TOKENS_PER_MINUTE` | `225000` | Input token budget used to pace Gemini requests. |
 | `MAX_TRANSCRIPT_VIDEO_AGE_DAYS` | `7` | Maximum age for transcript processing candidates. |
 | `MAX_TRANSCRIPT_CANDIDATES_PER_CHANNEL_PER_POLL` | `1` | Per-channel transcript attempts per poll. |
-| `MIN_VIDEO_DURATION_SECONDS` | `180` | Minimum duration after transcript retrieval; helps filter Shorts and short clips. |
+| `MIN_VIDEO_DURATION_SECONDS` | `300` | Minimum duration after transcript retrieval; helps filter Shorts and short clips. |
 | `TELEGRAM_MESSAGE_INTERVAL_SECONDS` | `0.5` | Delay between Telegram messages. |
 | `TRANSCRIPT_RETRY_DELAYS_MINUTES` | `15,60,180` | Retry schedule for transcript failures. |
 | `SUMMARY_RETRY_DELAYS_MINUTES` | `5,15,45` | Retry schedule for Gemini summary failures. |
